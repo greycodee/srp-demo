@@ -1,9 +1,9 @@
 package top.mjava.srp;
 
 import top.mjava.entity.SRPGroupEntity;
+import top.mjava.top.mjava.exception.SRPException;
 import top.mjava.util.SRPCommonUtils;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 
@@ -85,6 +85,29 @@ public class SRPClient {
         digest.update(B.toByteArray());
         digest.update(clientSecretKey.toByteArray());
         return new BigInteger(1,digest.digest());
+    }
+
+    /**
+     * 验证服务端返回的 M2
+     * @param digest 加密器
+     * @param A 客户端公钥
+     * @param M1 客户端计算的 M1
+     * @param clientSecretKey 客户端私钥
+     * */
+    public Boolean verifyM2(MessageDigest digest,
+                            BigInteger M2,
+                            BigInteger A,
+                            BigInteger M1,
+                            BigInteger clientSecretKey){
+        if (A==null || M1==null || clientSecretKey==null){
+            throw new SRPException("verifyM2：验证 M2 时参数有误，请检查");
+        }
+        digest.update(A.toByteArray());
+        digest.update(M1.toByteArray());
+        digest.update(clientSecretKey.toByteArray());
+
+        BigInteger verifyKey = new BigInteger(1,digest.digest());
+        return verifyKey.equals(M2);
     }
 
 }
