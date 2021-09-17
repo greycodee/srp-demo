@@ -1,7 +1,7 @@
 package top.mjava.srp;
 
 import top.mjava.entity.SRPGroupEntity;
-import top.mjava.top.mjava.exception.SRPException;
+import top.mjava.exception.SRPException;
 import top.mjava.util.SRPCommonUtils;
 
 import java.math.BigInteger;

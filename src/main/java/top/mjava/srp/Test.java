@@ -2,6 +2,7 @@ package top.mjava.srp;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import top.mjava.entity.SRPGroupEntity;
+import top.mjava.exception.SRPException;
 import top.mjava.util.SRPCommonUtils;
 
 import java.math.BigInteger;
@@ -23,7 +24,6 @@ public class Test {
 
         SRPServer server = new SRPServer(SRPCommonUtils.random_b());
         BigInteger v = server.calculate_v(digest,groups,userName,password,slat);
-
 
         // change 接口
         BigInteger B = server.calculateB(digest,groups,v);

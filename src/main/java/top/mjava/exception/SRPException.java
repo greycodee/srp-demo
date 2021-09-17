@@ -1,4 +1,4 @@
-package top.mjava.top.mjava.exception;
+package top.mjava.exception;
 
 /**
  * SRP 异常
