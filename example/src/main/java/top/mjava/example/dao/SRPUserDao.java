@@ -7,5 +7,5 @@ import top.mjava.example.entity.SRPUser;
 @Repository
 public interface SRPUserDao extends JpaRepository<SRPUser,Integer> {
 
-
+    SRPUser findByUserName(String userName);
 }

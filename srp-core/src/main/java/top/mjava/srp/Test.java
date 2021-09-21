@@ -10,43 +10,37 @@ import java.security.MessageDigest;
 public class Test {
 
     public static void main(String[] args) {
-        String userName = "greycodee";
-        String password = "huihiu123.";
+        MessageDigest messageDigest = DigestUtils.getSha1Digest();
+        BigInteger random_a = SRPCommonUtils.random_a();
+        BigInteger x = SRPCommonUtils.calculate_x(
+                messageDigest,
+                "kang1",
+                "kangkang123123",
+                "22623317-4c8c-4c02-8acb-d44f73a0ca72"
+        );
 
-        // 盐值
-        String slat = "jdskljlkasd";
-        // 设置 Group 和加密方法
-        SRPGroupEntity groups = SRPGroups.rfc5054_1024;
-        MessageDigest digest = DigestUtils.getSha1Digest();
+        BigInteger A = SRPClient.calculateA(
+                SRPGroups.rfc5054_1024,
+                random_a
+        );
+        System.out.println(A);
 
-        SRPClient client = new SRPClient(userName,password, SRPCommonUtils.random_a());
-
-        SRPServer server = new SRPServer(SRPCommonUtils.random_b());
-        BigInteger v = server.calculate_v(digest,groups,userName,password,slat);
-
-        // change 接口
-        BigInteger B = server.calculateB(digest,groups,v);
-
-        // auth 接口
-        // 客户端做的事 做完发给服务端
-        BigInteger A = client.calculateA(groups);
-        BigInteger client_secret = client.calculateSecretKey(digest,groups,A,B,slat);
-        BigInteger M1 = client.calculatedM1(digest,A,B,client_secret);
-
-
-        // 服务端接收到客户端请求后做的事
-        BigInteger server_secret = server.calculateSecretKey(digest,groups,A,B,v);
-        boolean flag_m1 = server.verifyM1(digest,M1,A,B,server_secret);
-        System.out.println(flag_m1);
-        BigInteger M2 = server.calculateM2(digest,A,M1,server_secret);
-
-        // 客户端收到返回的M2 验证 M2
-        boolean flag_m2 = client.verifyM2(digest,M2,A,M1,server_secret);
-        System.out.println(flag_m2);
-
-        System.out.println(client_secret);
-        System.out.println(server_secret);
-
-
+        BigInteger clientSecret = SRPClient.calculateSecretKey(
+                messageDigest,
+                SRPGroups.rfc5054_1024,
+                A,
+                new BigInteger("145077548320342492028380058301805914083145437951618418683057910230434223219173991207569760427426145286543888306272809482094825048293467307913027844992445213005533932696046243497890358527124085583572378385068736640237723381116197008306947257230635543815838189138786601838012645782595246312455029195478400397398"),
+                random_a,
+                "kang1",
+                "kang123123",
+                "22623317-4c8c-4c02-8acb-d44f73a0ca72"
+        );
+        BigInteger M1 = SRPClient.calculatedM1(
+                messageDigest,
+                A,
+                new BigInteger("145077548320342492028380058301805914083145437951618418683057910230434223219173991207569760427426145286543888306272809482094825048293467307913027844992445213005533932696046243497890358527124085583572378385068736640237723381116197008306947257230635543815838189138786601838012645782595246312455029195478400397398"),
+                clientSecret
+                );
+        System.out.println(M1);
     }
 }

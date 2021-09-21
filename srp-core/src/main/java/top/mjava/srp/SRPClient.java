@@ -24,24 +24,13 @@ import java.security.MessageDigest;
  * */
 public class SRPClient {
 
-    private String userName;
-    private String password;
-    private BigInteger a;
-
-    public SRPClient(String userName, String password, BigInteger a) {
-        this.userName = userName;
-        this.password = password;
-        this.a = a;
-    }
-
     /**
      * 计算客户端公钥 A
      * @param groups 素数 N 和 g
      * */
-    public BigInteger calculateA(SRPGroupEntity groups){
+    public static BigInteger calculateA(SRPGroupEntity groups, BigInteger a){
         return groups.getG().modPow(a,groups.getN());
     }
-
 
 
     /**
@@ -52,16 +41,19 @@ public class SRPClient {
      * @param B 服务端公钥
      * @param slat 盐值
      * */
-    public BigInteger calculateSecretKey(MessageDigest digest,
-                                         SRPGroupEntity groups,
-                                         BigInteger A,
-                                         BigInteger B,
-                                         String slat){
+    public static BigInteger calculateSecretKey(MessageDigest digest,
+                                                SRPGroupEntity groups,
+                                                BigInteger A,
+                                                BigInteger B,
+                                                BigInteger a,
+                                                String userName,
+                                                String password,
+                                                String slat){
         BigInteger N = groups.getN();
         BigInteger g = groups.getG();
         BigInteger u = SRPCommonUtils.calculate_u(digest, A, B, groups);
         BigInteger k = SRPCommonUtils.calculate_k(digest,groups);
-        BigInteger x = SRPCommonUtils.calculate_x(digest,this.userName,this.password,slat);
+        BigInteger x = SRPCommonUtils.calculate_x(digest,userName,password,slat);
 
         BigInteger tmp_one = k.multiply(g.modPow(x,N)).add(N);
         BigInteger tmp_two = a.add(u.multiply(x).mod(N)).mod(N);
@@ -77,10 +69,10 @@ public class SRPClient {
      * @param B 服务端公钥
      * @param clientSecretKey 客户端私钥
      * */
-    public BigInteger calculatedM1(MessageDigest digest,
-                                   BigInteger A,
-                                   BigInteger B,
-                                   BigInteger clientSecretKey){
+    public static BigInteger calculatedM1(MessageDigest digest,
+                                          BigInteger A,
+                                          BigInteger B,
+                                          BigInteger clientSecretKey){
         digest.update(A.toByteArray());
         digest.update(B.toByteArray());
         digest.update(clientSecretKey.toByteArray());
@@ -94,11 +86,11 @@ public class SRPClient {
      * @param M1 客户端计算的 M1
      * @param clientSecretKey 客户端私钥
      * */
-    public Boolean verifyM2(MessageDigest digest,
-                            BigInteger M2,
-                            BigInteger A,
-                            BigInteger M1,
-                            BigInteger clientSecretKey){
+    public static Boolean verifyM2(MessageDigest digest,
+                                   BigInteger M2,
+                                   BigInteger A,
+                                   BigInteger M1,
+                                   BigInteger clientSecretKey){
         if (A==null || M1==null || clientSecretKey==null){
             throw new SRPException("verifyM2：验证 M2 时参数有误，请检查");
         }

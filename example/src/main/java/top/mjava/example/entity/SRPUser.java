@@ -51,4 +51,14 @@ public class SRPUser {
     public void setSalt(String salt) {
         this.salt = salt;
     }
+
+    @Override
+    public String toString() {
+        return "SRPUser{" +
+                "id=" + id +
+                ", userName='" + userName + '\'' +
+                ", userV='" + userV + '\'' +
+                ", salt='" + salt + '\'' +
+                '}';
+    }
 }

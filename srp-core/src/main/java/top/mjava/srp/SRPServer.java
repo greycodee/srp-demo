@@ -12,19 +12,16 @@ import java.security.MessageDigest;
  * See RFC-5054
  * */
 public class SRPServer {
-    private BigInteger b;
-
-    public SRPServer(BigInteger b) {
-        this.b = b;
-    }
-
     /**
      * 计算服务器公钥 B
      * @param digest 加密器
      * @param groups SRP-6a Group
      * @param v 注册时生成的 v
      * */
-    public BigInteger calculateB(MessageDigest digest, SRPGroupEntity groups, BigInteger v){
+    public static BigInteger calculateB(MessageDigest digest,
+                                        SRPGroupEntity groups,
+                                        BigInteger v,
+                                        BigInteger b){
         BigInteger k = SRPCommonUtils.calculate_k(digest, groups);
         BigInteger N = groups.getN();
         BigInteger g = groups.getG();
@@ -43,11 +40,12 @@ public class SRPServer {
      * @param B 服务端公钥
      * @param v 注册时生成的 v
      * */
-    public BigInteger calculateSecretKey(MessageDigest digest,
-                                         SRPGroupEntity groups,
-                                         BigInteger A,
-                                         BigInteger B,
-                                         BigInteger v){
+    public static BigInteger calculateSecretKey(MessageDigest digest,
+                                                SRPGroupEntity groups,
+                                                BigInteger A,
+                                                BigInteger B,
+                                                BigInteger v,
+                                                BigInteger b){
         BigInteger u = SRPCommonUtils.calculate_u(digest, A, B, groups);
         BigInteger N = groups.getN();
         return A.multiply(v.modPow(u,N)).mod(N).modPow(b,N);
@@ -60,10 +58,10 @@ public class SRPServer {
      * @param M1 客户端计算的 M1
      * @param serverSecretKey 服务端私钥
      * */
-    public BigInteger calculateM2(MessageDigest digest,
-                                  BigInteger A,
-                                  BigInteger M1,
-                                  BigInteger serverSecretKey){
+    public static BigInteger calculateM2(MessageDigest digest,
+                                         BigInteger A,
+                                         BigInteger M1,
+                                         BigInteger serverSecretKey){
         if (A==null || M1==null || serverSecretKey==null){
             throw new SRPException("创建 M2 时参数有误，请检查");
         }
@@ -81,8 +79,11 @@ public class SRPServer {
      * @param password 登陆密码
      * @param slat 盐值
      * */
-    public BigInteger calculate_v(MessageDigest digest, SRPGroupEntity groups,
-                                  String userName, String password, String slat){
+    public static BigInteger calculate_v(MessageDigest digest,
+                                         SRPGroupEntity groups,
+                                         String userName,
+                                         String password,
+                                         String slat){
         BigInteger x = SRPCommonUtils.calculate_x(digest,userName,password,slat);
         return groups.getG().modPow(x,groups.getN());
     }
@@ -95,11 +96,11 @@ public class SRPServer {
      * @param B 服务端公钥
      * @param serverSecretKey 服务端私钥
      * */
-    public Boolean verifyM1(MessageDigest digest,
-                            BigInteger M1,
-                            BigInteger A,
-                            BigInteger B,
-                            BigInteger serverSecretKey){
+    public static Boolean verifyM1(MessageDigest digest,
+                                   BigInteger M1,
+                                   BigInteger A,
+                                   BigInteger B,
+                                   BigInteger serverSecretKey){
         if (A==null || B==null || serverSecretKey==null){
             throw new SRPException("验证 M1 时参数有误，请检查");
         }
