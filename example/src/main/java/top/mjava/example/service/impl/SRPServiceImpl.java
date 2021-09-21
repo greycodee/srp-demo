@@ -27,30 +27,6 @@ public class SRPServiceImpl implements SRPService {
     StringRedisTemplate stringRedisTemplate;
 
     @Override
-    public void saveUser() {
-        SRPUser user = new SRPUser();
-        user.setUserV("sadasdf");
-        user.setUserName("greycode");
-        user.setSalt("232dddd");
-        srpUserDao.save(user);
-    }
-
-    @Override
-    public List<SRPUser> getAllUser() {
-        return srpUserDao.findAll();
-    }
-
-    @Override
-    public void redisSet() {
-        stringRedisTemplate.opsForValue().set("name","huihiu");
-    }
-
-    @Override
-    public String redisGet() {
-        return stringRedisTemplate.opsForValue().get("name");
-    }
-
-    @Override
     public void registerUser(String username, String password) {
         String slat = UUID.randomUUID().toString();
         // 计算 v 值
